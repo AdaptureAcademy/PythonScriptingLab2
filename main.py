@@ -13,23 +13,6 @@ headers = {
 }
 
 
-# Function to fetch user details from Cloudflare's API
-def fetch_user_details():
-    # Define the URL for the user details endpoint
-    url = 'https://api.cloudflare.com/client/v4/user'
-    # Send a GET request to the specified URL, with the defined headers
-    response = requests.get(url, headers=headers)
-    # Check if the response status code is 200 (OK)
-    if response.ok:
-        # Parse the JSON response and print it
-        data = response.json()
-        print(data)
-    else:
-        # If the response status code is not 200, print the error status code and response text
-        print(f'Error: {response.status_code}')
-        print(response.text)
-
-
 def create_dns_record(zone_id, dns_record_data):
     # Define the URL for the DNS record creation endpoint, including the specified zone ID
     url = f'https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records'
