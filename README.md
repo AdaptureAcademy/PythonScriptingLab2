@@ -1,4 +1,4 @@
-## Lab Tasks
+## Lab Task 2 - Intermediate
 
 In this lab, you are tasked with extending the functionality of the `main.py` script by adding new functions to interact with DNS records on Cloudflare. Specifically, you will:
 
