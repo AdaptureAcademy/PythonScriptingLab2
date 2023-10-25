@@ -4,56 +4,96 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-api_token = os.getenv('API_TOKEN')
+# Define Cloudflare API credentials
+api_key = os.getenv('API_KEY')
+email = os.getenv('EMAIL')
+zone_id = os.getenv('ZONE_ID')
 
-# Define headers for the API requests, including the Authorization token and the content type.
+# Common headers for Cloudflare API requests (For Authorization)
 headers = {
-    'Authorization': f'Bearer {api_token}',
+    'X-Auth-Email': email,
+    'X-Auth-Key': api_key,
     'Content-Type': 'application/json',
 }
 
-
+# Function to create a DNS record
 def create_dns_record(zone_id, dns_record_data):
-    # Define the URL for the DNS record creation endpoint, including the specified zone ID
     url = f'https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records'
-    # Send a POST request to the specified URL, with the defined headers and JSON payload
-    response = requests.post(url, headers=headers, json=dns_record_data)
-    # Check if the response status code is 200 (OK)
-    if response.ok:
-        # Parse the JSON response and print it
-        data = response.json()
-        print(data)
+    response = requests.post(url, json=dns_record_data, headers=headers)
+
+    if response.status_code == 200:
+        print("DNS record created successfully.")
     else:
-        # If the response status code is not 200, print the error status code and response text
-        print(f'Error: {response.status_code}')
-        print(response.text)
+        print(f"Error creating DNS record. Status Code: {response.status_code}")
+        print("Response:", response.text)
 
-
+# Function to fetch DNS records
 def fetch_dns_records(zone_id):
-    # TODO: 
-    # Define the URL based on the provided zone_id
-    # Send a GET request to the URL with the appropriate headers
-    # Handle the response, outputting the result if successful, or the error if it fails
-    pass
+    url = f'https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records'
+    response = requests.get(url, headers=headers)
 
+    if response.status_code == 200:
+        dns_records = response.json()
+        print("DNS Records:")
+        for record in dns_records["result"]:
+            print(f"Type: {record['type']}, Name: {record['name']}, Content: {record['content']}")
+    else:
+        print(f"Error fetching DNS records. Status Code: {response.status_code}")
+        print("Response:", response.text)
 
-def edit_dns_record(zone_id, record_id, record_data):
-    # TODO:
-    # Define the URL based on the provided zone_id and record_id
-    # Send a PUT request to the URL with the appropriate headers and the updated record_data as JSON
-    # Handle the response, outputting the result if successful, or the error if it fails
-    pass
+# Function to update a DNS record
+def update_dns_record(zone_id, record_id, updated_data):
+    url = f'https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records/{record_id}'
+    response = requests.put(url, json=updated_data, headers=headers)
 
+    if response.status_code == 200:
+        print("DNS record updated successfully.")
+    else:
+        print(f"Error updating DNS record. Status Code: {response.status_code}")
+        print("Response:", response.text)
 
+# Function to delete a DNS record
 def delete_dns_record(zone_id, record_id):
-    # TODO:
-    # Define the URL based on the provided zone_id and record_id
-    # Send a DELETE request to the URL with the appropriate headers
-    # Handle the response, outputting the result if successful, or the error if it fails
-    pass
+    url = f'https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records/{record_id}'
+    response = requests.delete(url, headers=headers)
+
+    if response.status_code == 200:
+        print("DNS record deleted successfully.")
+    else:
+        print(f"Error deleting DNS record. Status Code: {response.status_code}")
+        print("Response:", response.text)
 
 
-# Press the green button in the gutter to run the script.
+
 if __name__ == '__main__':
-    # TODO: Call all the above functions here
-    pass
+
+    # all the functions will be called from this main function if any function needs to be commented it needs to be commented here.
+
+    #  DNS record data for creation
+    dns_record_data = {
+        'type': 'A',
+        'name': 'thiswebsite.com',
+        'content': '192.168.1.9'
+    }
+
+    # Call the create_dns_record function
+    create_dns_record(zone_id, dns_record_data)
+
+    # Call the fetch_dns_records function to display DNS records
+    fetch_dns_records(zone_id)
+
+    # updated data for updating a DNS record (for updating a DNS record)
+    updated_data = {
+        'type': 'A',
+        'name': 'updatedwebsite.com',
+        'content': '192.168.1.3'
+    }
+
+    # record_id for updating and deleting a DNS record (this  record_id can be fetched from the record_id.py script)
+    record_id = 'f539a61510a1bfec472db0fd76cdacec'
+
+    # Call the update_dns_record function
+    update_dns_record(zone_id, record_id, updated_data)
+
+    # Call the delete_dns_record function
+    delete_dns_record(zone_id, record_id)
